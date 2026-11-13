@@ -1,19 +1,8 @@
-/* Анализ динамики продаж Month-over-Month (MoM Growth %) и Накопительный итог.
+/* Анализ динамики продаж Month-over-Month (MoM Growth %).
 Задача: Рассчитать скользящую выручку день к дню, а также ежемесячные темпы прироста 
 продаж в процентах к прошлому периоду с защитой от ошибок деления на ноль. */
 
--- Вариант А: Накопительный итог (Running Total) для мониторинга выполнения планов
-SELECT 
-    order_date,
-    SUM(quantity * list_price) AS daily_revenue,
-    SUM(SUM(quantity * list_price)) OVER (ORDER BY order_date) AS running_total
-FROM sales.orders o
-INNER JOIN sales.order_items s 
-    ON s.order_id = o.order_id
-WHERE order_date BETWEEN '2016-01-01' AND '2016-01-05'
-GROUP BY order_date;
-
--- Вариант Б: Расчет темпов роста продаж (MoM Growth) через функцию LAG
+-- Расчет темпов роста продаж (MoM Growth) через функцию LAG
 WITH MonthlyRevenue AS (
     SELECT 
         DATETRUNC(month, o.order_date) AS order_month,
